@@ -11,7 +11,7 @@ router.route('/').get((req, res) => {
 });
 
 router.route('/nlp').post((req, res) => {
-  NLP.test(req.body.text, req.body.targets).then((resp) => {res.send({ status: 200, error: null, resp })}).catch((err) => 
+  NLP.analyzeCourses(req.body.text, req.body.targets).then((resp) => {res.send({ status: 200, error: null, resp })}).catch((err) => 
   res.status(err.code.status).send({
     status: err.code.status,
     error: err.error,
