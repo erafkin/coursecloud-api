@@ -52,7 +52,7 @@ const readFileAndCall = (promises, subject, course, targets) => {
 
 export const analyzeCourses = (targets, subject, course) => {
     var promises = [];
-    const subjects = ['PSYCH', 'ENGS', 'COSC', 'ECON', 'GOV'];
+    const subjects = ['PSYC', 'ENGS', 'COSC', 'ECON', 'GOV'];
     return new Promise((resolve,reject) => {
         if(subject === undefined) {
             if(course === undefined) {
