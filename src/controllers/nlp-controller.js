@@ -1,7 +1,8 @@
 const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1');
 const { IamAuthenticator } = require('ibm-watson/auth');
 require('dotenv').config();
-const fs = require('fs')
+const fs = require('fs');
+const path = require("path");
 
 
 const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
@@ -24,40 +25,36 @@ const analyzeParams=(text, targets) => {
     });
 };
 
-const readFileAndCall = (promises, subj, course, targets) => {
-    const path = `../../${subj}/${course}`
-    try {
-        if (fs.existsSync(path)) {
-            //file exists
-            fs.readFile(path, 'utf8', function(err, file){ 
-                if (err) console.log(err);
-                else {
-                    promises.push(new Promise((res, rej) => {
-                        naturalLanguageUnderstanding.analyze(analyzeParams(file, targets))
-                        .then(analysisResults => {
-                            console.log(JSON.stringify(analysisResults.result, null, 2));
-                            res(analysisResults.result);
-                        })
-                        .catch(e => {
-                            console.log('error:', e);
-                            //if one fails I think it should keep going ? we can change this though
-                            res(e)
-                        });
-                    })); 
-                }
-            });   
-        }
-    } catch(err) {
-        console.error('file does not exist')
-    }
+const readFileAndCall = (promises, subject, course, targets) => {
+    const p = path.resolve(__dirname,`../../data/${subject}/${subject}${course}.txt`);
+    promises.push(new Promise((res, rej) => {
+        fs.readFile(p, 'utf8', function(err, file){ 
+            if (err) {
+                console.log(err);
+                res(`no course ${subject}${course}`);
+            } else {
+                console.log('read file');
+                naturalLanguageUnderstanding.analyze(analyzeParams(file, targets))
+                .then(analysisResults => {
+                    console.log(JSON.stringify(analysisResults.result, null, 2));
+                    res(analysisResults.result);
+                })
+                .catch(e => {
+                    console.log('error:', e);
+                    //if one fails I think it should keep going ? we can change this though
+                    res(e)
+                });
+            }
+        });
+    })); 
 }
 
 export const analyzeCourses = (targets, subject, course) => {
     var promises = [];
     const subjects = ['PSYCH', 'ENGS', 'COSC', 'ECON', 'GOV'];
     return new Promise((resolve,reject) => {
-        if(subject === null) {
-            if(course === null) {
+        if(subject === undefined) {
+            if(course === undefined) {
                 subjects.forEach((subj) => {
                     for(let i = 1; i < 25; i++) {
                         readFileAndCall(promises, subj, i, targets);
@@ -69,7 +66,7 @@ export const analyzeCourses = (targets, subject, course) => {
                 });
             }
         } else {
-            if(course === null) {
+            if(course === undefined) {
                 for(let i = 1; i < 25; i++) {
                     readFileAndCall(promises, subject, i, targets);
                 }
@@ -77,13 +74,15 @@ export const analyzeCourses = (targets, subject, course) => {
                 readFileAndCall(promises, subject, course, targets); 
             }
         }
+        console.log(promises);
         Promise.all(promises).then((result)=>{
             //todo: this is where we should structure the results...whatever that would look like
+            console.log("DONE");
             resolve(result)
         }).catch((error) => {
             //if the big promise fails then they should all fail
             console.log(error);
-            reject(error)
+            resolve(error)
         });
     });
 
