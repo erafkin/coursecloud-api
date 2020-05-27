@@ -37,6 +37,7 @@ const readFileAndCall = (promises, subject, course, targets) => {
                 naturalLanguageUnderstanding.analyze(analyzeParams(file, targets))
                 .then(analysisResults => {
                     console.log(JSON.stringify(analysisResults.result, null, 2));
+                    analysisResults.result["course"] =`${subject}${course}`
                     res(analysisResults.result);
                 })
                 .catch(e => {
