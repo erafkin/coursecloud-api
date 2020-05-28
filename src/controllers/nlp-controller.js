@@ -19,7 +19,17 @@ const analyzeParams=(text, targets) => {
         'text': text,
         'features': {
             'sentiment': {
-            'targets' : targets
+            'targets' : targets,
+            'document': true
+            },
+            'keywords': {
+                'sentiment': true,
+                'emotion': true,
+                'limit': 5
+            },
+            'emotion': {
+                'document': true,
+                'targets': targets
             }
         }
     });
