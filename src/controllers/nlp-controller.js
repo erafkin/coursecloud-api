@@ -8,9 +8,9 @@ const path = require("path");
 const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
   version: '2019-07-12',
   authenticator: new IamAuthenticator({
-    apikey: process.env.apikey,
+    apikey: process.env.nlpapikey,
   }),
-  url: process.env.url,
+  url: process.env.nlpurl,
 });
 
 const analyzeParams=(text, targets) => {
